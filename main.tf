@@ -9,7 +9,7 @@ terraform {
 
 provider "aws" {
   profile = "terraform"
-  region  = "eu-central-1"
+  region  = var.aws_region
 }
 
 resource "aws_resourcegroups_group" "my_group" {
@@ -31,13 +31,9 @@ resource "aws_resourcegroups_group" "my_group" {
 JSON
   }
 
-  tags = {
-    Name        = "tm-devops-trainee-rg"
-    Environment = "Test"
-    Project     = "DevOps-Trainee"
-    ManagedBy   = "Terraform"
-    Owner       = "Denys Smetaniak"
-  }
+  tags = merge(var.default_tags, {
+    Name = var.rg_name
+  })
 }
 
 

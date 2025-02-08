@@ -85,15 +85,6 @@ resource "aws_iam_role_policy_attachment" "efs_attach" {
 # resource "aws_efs_file_system" "tm_devops_trainee_efs" {
 #   creation_token = "tm-devops-trainee-efs"
 #
-#   tags = {
-#     Name        = "tm-devops-trainee-efs"
-#     Environment = "Test"
-#     Project     = "DevOps-Trainee"
-#     ManagedBy   = "Terraform"
-#     Owner       = "Denys Smetaniak"
-#   }
-# }
-#
 # # EFS Mount Targets
 # resource "aws_efs_mount_target" "tm_devops_trainee_efs_mount" {
 #   for_each = toset(module.vpc.private_subnets)

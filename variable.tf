@@ -59,9 +59,10 @@ variable "aws_region" {
   default = "eu-central-1"
 }
 
-////////////////// Variable for SG /////////////////
-
-
+variable "rg_name" {
+  type = string
+  default = "tm-devops-trainee-rg"
+}
 
 ////////////////// Variable for TG /////////////////
 

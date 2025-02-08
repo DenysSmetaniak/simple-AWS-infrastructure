@@ -2,7 +2,7 @@ terraform {
   backend "s3" {
     bucket         = "tm-devops-trainee-bucket"
     key            = "terraform/state/terraform.tfstate"
-    region         = "eu-central-1"
+    region         = var.aws_region
     dynamodb_table = "tm-devops-trainee-table"
     encrypt        = true
   }
