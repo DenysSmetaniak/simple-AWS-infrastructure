@@ -1,0 +1,88 @@
+# --- Terraform ---
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+*.tfplan
+terraform.tfstate.d/
+terraform.tfvars
+
+# --- AWS Credentials ---
+.env
+.env.local
+*.pem
+*.key
+*.crt
+.aws/
+config
+credentials
+
+# --- Docker ---
+*.log
+.dockerignore
+docker-compose.override.yml
+docker-compose*.yml.bak
+.envrc
+docker-volume/
+__pycache__/
+.docker/
+Dockerfile
+
+# --- Kubernetes / Helm ---
+*.kube/
+.kube/config
+helm-release.yaml
+values.yaml
+charts/
+*.tgz
+.ssh-tm
+
+# --- Node.js (Frontend, Vite, React) ---
+node_modules/
+dist/
+build/
+*.cache
+*.log
+yarn.lock
+pnpm-lock.yaml
+npm-debug.log*
+.vite/
+.vite-cache/
+index.html
+init_efs.sh
+nginx.conf
+
+# --- Python ---
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+
+# --- Logs & Debugging ---
+logs/
+*.log
+debug.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+server-debug.log
+
+# --- IDE / OS Specific ---
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+*.sublime-workspace
+*.sublime-project
+
+# --- Miscellaneous ---
+coverage/
+*.bak
+*.swp
+*.swo
+*.swn
