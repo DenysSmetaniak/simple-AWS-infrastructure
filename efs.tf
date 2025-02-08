@@ -59,11 +59,11 @@ output "efs_access_point_id" {
 resource "aws_iam_policy" "efs_access" {
   name        = var.efs_iam_policy_name
   description = "Policy to allow EC2 access to EFS"
-  policy      = jsonencode({
+  policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Effect   = "Allow"
-      Action   = [
+      Effect = "Allow"
+      Action = [
         "elasticfilesystem:DescribeFileSystems",
         "elasticfilesystem:DescribeMountTargets",
         "elasticfilesystem:ClientMount",

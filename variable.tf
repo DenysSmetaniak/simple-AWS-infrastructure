@@ -60,7 +60,7 @@ variable "aws_region" {
 }
 
 variable "rg_name" {
-  type = string
+  type    = string
   default = "tm-devops-trainee-rg"
 }
 
@@ -129,89 +129,89 @@ variable "health_check_matcher" {
 ////////////////// Variable for ECS /////////////////
 
 variable "cluster_name" {
-  type = string
+  type    = string
   default = "tm-devops-trainee-ecs"
 }
 
 variable "nginx_service_cpu" {
-  type = number
+  type    = number
   default = 256
 }
 
 variable "nginx_service_memory" {
-  type = number
+  type    = number
   default = 512
 }
 
 variable "cd_nginx_cpu" {
-  type = number
+  type    = number
   default = 256
 }
 
 variable "cd_nginx_memory" {
-  type = number
+  type    = number
   default = 512
 }
 
 ////////////////// Variable for EC2 /////////////////
 
 variable "ec2_ami" {
-  type = string
+  type    = string
   default = "ami-03b3b5f65db7e5c6f"
 }
 
 variable "ec2_instance_type" {
-  type = string
+  type    = string
   default = "t2.micro"
 }
 
 variable "policy_arn" {
-  type = string
+  type    = string
   default = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 variable "name_iam_instance_profile" {
-  type = string
+  type    = string
   default = "EC2SSMInstanceProfile"
 }
 
 ////////////////// Variable for EFC /////////////////
 
 variable "efs_name" {
-  type = string
+  type    = string
   default = "tm-devops-trainee-efs"
 }
 
 variable "efs_creation_token" {
-  type = string
+  type    = string
   default = "tm-devops-trainee-efs-token"
 }
 
 variable "efs_iam_policy_name" {
-  type = string
+  type    = string
   default = "EFSFullAccess"
 }
 
 ////////////////// Variable for ALB /////////////////
 
 variable "alb_name" {
-  type = string
+  type    = string
   default = "tm-devops-trainee-alb"
 }
 
 variable "lb_type" {
-  type = string
+  type    = string
   default = "application"
 }
 
 variable "listener_ssl_policy" {
-  type = string
+  type    = string
   default = "ELBSecurityPolicy-2016-08"
 }
 
 variable "certificate_arn" {
   description = "ARN of the TLS certificate"
-  type = string
+  type        = string
   sensitive   = true
 }
 
