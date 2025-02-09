@@ -96,19 +96,23 @@ resource "aws_iam_policy" "efs_access" {
   description = "Policy to allow ECS access to EFS"
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Action = [
-        "elasticfilesystem:DescribeFileSystems",
-        "elasticfilesystem:DescribeMountTargets",
-        "elasticfilesystem:DescribeAccessPoints",
-        "elasticfilesystem:ClientMount",
-        "elasticfilesystem:ClientWrite"
-      ]
-      Resource = module.efs.arn
-    }]
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "elasticfilesystem:DescribeFileSystems",
+          "elasticfilesystem:DescribeMountTargets",
+          "elasticfilesystem:DescribeAccessPoints",
+          "elasticfilesystem:ClientMount",
+          "elasticfilesystem:ClientWrite",
+          "elasticfilesystem:MountTarget"
+        ]
+        Resource = module.efs.arn
+      }
+    ]
   })
 }
+
 
 resource "aws_iam_role_policy_attachment" "ecs_efs_attach" {
   role       = aws_iam_role.ecs_task_execution_role.name

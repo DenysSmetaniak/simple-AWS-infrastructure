@@ -56,10 +56,10 @@ resource "aws_security_group" "tm_devops_trainee_efs_sg" {
   vpc_id = module.vpc.vpc_id
 
   ingress {
-    from_port       = 2049
-    to_port         = 2049
-    protocol        = "tcp"
-    security_groups = [aws_security_group.tm_devops_trainee_ecs_sg.id] # Allow access from ECS
+    from_port   = 2049
+    to_port     = 2049
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16"] # Allow access for the entire VPC
   }
 
   egress {
