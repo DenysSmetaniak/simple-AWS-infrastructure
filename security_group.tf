@@ -31,6 +31,7 @@ resource "aws_security_group" "tm_devops_trainee_alb_sg" {
 # Security Group for ECS
 resource "aws_security_group" "tm_devops_trainee_ecs_sg" {
   vpc_id = module.vpc.vpc_id
+  name   = "ecs-sg"
 
   ingress {
     from_port       = 80
@@ -53,13 +54,17 @@ resource "aws_security_group" "tm_devops_trainee_ecs_sg" {
 
 # Security Group для EFS
 resource "aws_security_group" "tm_devops_trainee_efs_sg" {
-  vpc_id = module.vpc.vpc_id
+  name        = "efs-sg"
+  description = "Allow NFS traffic from ECS only"
+  vpc_id      = module.vpc.vpc_id
 
   ingress {
-    from_port   = 2049
-    to_port     = 2049
-    protocol    = "tcp"
-    cidr_blocks = ["10.0.0.0/16"] # Allow access for the entire VPC
+    from_port = 2049
+    to_port   = 2049
+    protocol  = "tcp"
+    #     cidr_blocks = ["10.0.0.0/16"] # Allow access for the entire VPC
+    security_groups = [aws_security_group.tm_devops_trainee_ecs_sg.id]
+    description     = "Allow NFS access from ECS instances"
   }
 
   egress {
