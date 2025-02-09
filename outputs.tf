@@ -18,4 +18,8 @@ output "vpc_cidr_block" {
   value       = module.vpc.vpc_cidr_block
 }
 
+output "dynamodb_table_arn" {
+  description = "The ARN of the existing DynamoDB table"
+  value       = data.aws_dynamodb_table.tm_devops_trainee_table.arn
+}
 

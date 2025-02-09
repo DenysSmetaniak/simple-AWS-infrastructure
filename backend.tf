@@ -8,22 +8,12 @@ terraform {
   }
 }
 
-resource "aws_dynamodb_table" "tm_devops_trainee_table" {
-  name         = "tm-devops-trainee-table"
-  billing_mode = "PAY_PER_REQUEST"
+data "aws_dynamodb_table" "tm_devops_trainee_table" {
+  name = "tm-devops-trainee-table"
+}
 
-  hash_key = "LockID"
-
-  attribute {
-    name = "LockID"
-    type = "S"
-  }
-
-  tags = {
-    Name        = "tm-devops-trainee-table"
-    Environment = "Test"
-    Project     = "DevOps-Trainee"
-    ManagedBy   = "Terraform"
-    Owner       = "Denys Smetaniak"
-  }
+variable "dynamodb_table_name" {
+  description = "The name of the DynamoDB table used for Terraform state locking"
+  type        = string
+  default     = "tm-devops-trainee-table"
 }

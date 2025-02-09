@@ -18,6 +18,23 @@ module "ecs" {
 
       enable_execute_command = true
 
+      task_execution_role = aws_iam_role.ecs_task_execution_role.arn
+
+      volumes = [
+        {
+          name = "efs-volume"
+          efs_volume_configuration = {
+            file_system_id     = module.efs.id
+            root_directory     = "/"
+            transit_encryption = "ENABLED"
+            authorization_config = {
+              access_point_id = aws_efs_access_point.efs_access_point.id
+              iam             = "ENABLED"
+            }
+          }
+        }
+      ]
+
       container_definitions = {
         nginx = {
           cpu       = var.cd_nginx_cpu
@@ -33,6 +50,15 @@ module "ecs" {
           ]
 
           readonly_root_filesystem = false
+
+          mount_points = [
+            {
+              source_volume  = "efs-volume"
+              container_path = "/usr/share/nginx/html"
+              read_only      = false
+            }
+          ]
+
         }
       }
 
