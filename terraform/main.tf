@@ -36,9 +36,6 @@ JSON
   })
 }
 
-data "aws_dynamodb_table" "tm_devops_trainee_table" {
-  name = "tm-devops-trainee-table"
-}
 
 
 
