@@ -13,7 +13,7 @@ provider "aws" {
 }
 
 resource "aws_resourcegroups_group" "my_group" {
-  name = "tm-devops-trainee-rg"
+  name = var.rg_name
 
   resource_query {
     query = <<JSON
@@ -35,6 +35,8 @@ JSON
     Name = var.rg_name
   })
 }
+
+
 
 
 

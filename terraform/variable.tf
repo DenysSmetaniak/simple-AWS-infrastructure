@@ -64,6 +64,23 @@ variable "rg_name" {
   default = "tm-devops-trainee-rg"
 }
 
+////////////////// Variable for S3 and DynamoDB /////////////////
+
+variable "bucket" {
+  type = string
+  default = "tm-devops-trainee-bucket"
+}
+
+variable "bucket_key" {
+  type = string
+  default = "terraform/state/terraform.tfstate"
+}
+
+variable "dynamodb_table_name" {
+  type = string
+  default = "tm-devops-trainee-table"
+}
+
 ////////////////// Variable for TG /////////////////
 
 variable "tg_name" {
@@ -117,7 +134,7 @@ variable "health_check_healthy_threshold" {
 variable "health_check_unhealthy_threshold" {
   description = "Unhealthy threshold for health check"
   type        = number
-  default     = 3
+  default     = 2
 }
 
 variable "health_check_matcher" {
@@ -128,29 +145,59 @@ variable "health_check_matcher" {
 
 ////////////////// Variable for ECS /////////////////
 
-variable "cluster_name" {
+variable "ecs_cluster_name" {
   type    = string
   default = "tm-devops-trainee-ecs"
 }
 
-variable "nginx_service_cpu" {
-  type    = number
+variable "ecs_cluster_setting_name" {
+  type = string
+  default = "containerInsights"
+}
+
+variable "ecs_cluster_setting_value" {
+  type = string
+  default = "enabled"
+}
+
+variable "ecs_task_execution_role_name" {
+  type = string
+  default = "ecsTaskExecutionRole"
+}
+
+variable "ecs_task_execution_role_policy_name" {
+  type = string
+  default = "ecs-task-execution-role-policy"
+}
+
+variable "ecs_nginx_task_family" {
+  type = string
+  default = "ecs_nginx-task"
+}
+
+variable "ecs_nginx_task_nm" {
+  type = string
+  default = "awsvpc"
+}
+
+variable "ecs_nginx_task_cpu" {
+  type = number
   default = 256
 }
 
-variable "nginx_service_memory" {
-  type    = number
+variable "ecs_nginx_task_memory" {
+  type = number
   default = 512
 }
 
-variable "cd_nginx_cpu" {
-  type    = number
-  default = 256
+variable "ecs_nginx_service_name" {
+  type = string
+  default = "nginx-service"
 }
 
-variable "cd_nginx_memory" {
-  type    = number
-  default = 512
+variable "efs_access" {
+  type = string
+  default = "ecs-efs-access-policy"
 }
 
 ////////////////// Variable for EC2 /////////////////

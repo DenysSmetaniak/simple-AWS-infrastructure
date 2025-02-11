@@ -1,4 +1,5 @@
-# Target group for ECS
+///////////////////////////// Target group for ECS ///////////////////////////
+
 resource "aws_lb_target_group" "tm_devops_trainee_tg" {
   name        = var.tg_name
   port        = var.tg_port
