@@ -81,6 +81,11 @@ variable "dynamodb_table_name" {
   default = "tm-devops-trainee-table"
 }
 
+variable "s3_encrypt" {
+  type = bool
+  default = true
+}
+
 ////////////////// Variable for TG /////////////////
 
 variable "tg_name" {
