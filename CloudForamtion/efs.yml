@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create an Elastic File System and two Mount Targe for PrivateSubnet1 and PrivateSubnet2, respectively
+
+Resources:
+  # Create filesystem з назвою 'tm-devops-trainee-efs'
+  EFSFileSystem:
+    Type: AWS::EFS::FileSystem
+    Properties:
+      Encrypted: true
+      PerformanceMode: generalPurpose
+      ThroughputMode: bursting
+      FileSystemTags:
+        - Key: Name
+          Value: 'tm-devops-trainee-efs'
+
+  # Mount target allows usage of the EFS inside of PrivateSubnet1
+  EFSMountTargetOne:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref EFSFileSystem
+      SubnetId: !ImportValue PrivateSubnet1
+      SecurityGroups:
+        - !ImportValue EFSFileSystemSecurityGroup
+
+  # Mount target allows usage of the EFS inside of PrivateSubnet2
+  EFSMountTargetTwo:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref EFSFileSystem
+      SubnetId: !ImportValue PrivateSubnet2
+      SecurityGroups:
+        - !ImportValue EFSFileSystemSecurityGroup
+
+Outputs:
+  # Export File System Id and File System Arn
+  EFSFileSystem:
+    Description: EFSFileSystem
+    Value: !Ref EFSFileSystem
+    Export:
+      Name: 'EFSFileSystem'
+
+  EFSFileSystemArn:
+    Value: !GetAtt EFSFileSystem.Arn
+    Export:
+      Name: "EFSFileSystemArn"

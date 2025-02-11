@@ -1,11 +1,12 @@
 # --- Terraform ---
 *.tfstate
 *.tfstate.backup
-.terraform/
-.terraform.lock.hcl
+terraform/.terraform/
+terraform/.terraform.lock.hcl
 *.tfplan
 terraform.tfstate.d/
-terraform.tfvars
+terraform/terraform.tfvars
+ec2.tf
 
 # --- AWS Credentials ---
 .env
@@ -26,7 +27,7 @@ docker-compose*.yml.bak
 docker-volume/
 __pycache__/
 .docker/
-Dockerfile
+terraform/Dockerfile
 
 # --- Kubernetes / Helm ---
 *.kube/
@@ -35,7 +36,7 @@ helm-release.yaml
 values.yaml
 charts/
 *.tgz
-.ssh-tm
+terraform/.ssh-tm
 
 # --- Node.js (Frontend, Vite, React) ---
 node_modules/
@@ -48,9 +49,9 @@ pnpm-lock.yaml
 npm-debug.log*
 .vite/
 .vite-cache/
-index.html
-init_efs.sh
-nginx.conf
+terraform/index.html
+terraform/init_efs.sh
+terraform/nginx.conf
 
 # --- Python ---
 *.pyc
