@@ -117,7 +117,7 @@ terraform plan -out=tfplan
 ```bash
 terraform apply -auto-approve tfplan
 ```
-#### **Step 8: Connect to the Container and Create the File**
+#### **Step 8: connect to the container and create the file**
 To list running ECS tasks, use:
 ```bash
 aws ecs list-tasks --cluster tm-devops-trainee-cluster
@@ -131,19 +131,19 @@ aws ecs execute-command --cluster tm-devops-trainee-cluster \
   --interactive --command "/bin/sh"
 ```
 
-#### **Step 9: Verify System Installation**
+#### **Step 9: verify system installation**
 Check if the system is properly installed by running:
 ```bash
 df -h
 ```
 
-#### **Step 10: Run EFS Initialization Script**
+#### **Step 10: run EFS initialization script**
 Execute the following command inside the container:
 ```bash
 ./init_efs.sh
 ```
 
-#### **Step 8: get ALB public URL**
+#### **Step 11: get ALB public URL**
 ```bash
 terraform output alb_dns_name
 ```
