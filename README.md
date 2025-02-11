@@ -282,6 +282,7 @@ Successful completion of the testing phase and request for confirmation of deplo
 ![Success CI](./screen/success_ci.jpg)
 
 Manual approve
+
 ![Manual approve](./screen/img.png)
 
 Successful completion of two stages of pipelining
