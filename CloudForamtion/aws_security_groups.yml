@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create security groups for ALB, ECS containers, and EFS
+
+Resources:
+
+  # Security group for ALB
+  tm-devops-trainee-alb-sg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group for ALB
+      VpcId: !ImportValue tm-devops-trainee-vpc
+      SecurityGroupIngress:
+        - IpProtocol: -1
+          CidrIp: '0.0.0.0/0'
+      Tags:
+        - Key: Name
+          Value: 'tm-devops-trainee-alb-sg'
+
+  # Security group for ECS
+  tm-devops-trainee-ecs-sg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group for ECS containers
+      VpcId: !ImportValue tm-devops-trainee-vpc
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          SourceSecurityGroupId: !Ref tm-devops-trainee-alb-sg
+      Tags:
+        - Key: Name
+          Value: 'tm-devops-trainee-ecs-sg'
+
+  # Security group for EFS
+  tm-devops-trainee-efs-sg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group for EFS file system
+      VpcId: !ImportValue tm-devops-trainee-vpc
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 2049
+          ToPort: 2049
+          SourceSecurityGroupId: !Ref tm-devops-trainee-ecs-sg
+      Tags:
+        - Key: Name
+          Value: 'tm-devops-trainee-efs-sg'
+
+Outputs:
+
+  # Exporting ALB security group
+  ALBSecurityGroup:
+    Description: ALB Security Group ID
+    Value: !Ref tm-devops-trainee-alb-sg
+    Export:
+      Name: 'tm-devops-trainee-alb-sg'
+
+  # Exporting ECS security group
+  ECSSecurityGroup:
+    Description: ECS Security Group ID
+    Value: !Ref tm-devops-trainee-ecs-sg
+    Export:
+      Name: 'tm-devops-trainee-ecs-sg'
+
+  # Exporting EFS security group
+  EFSSecurityGroup:
+    Description: EFS Security Group ID
+    Value: !Ref tm-devops-trainee-efs-sg
+    Export:
+      Name: 'tm-devops-trainee-efs-sg'
+

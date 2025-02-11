@@ -1,0 +1,104 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creation of ECS Cluster, task definitions, and service
+
+Resources:
+
+  # Create ECS with the name 'tm-devops-trainee-ecs'
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: tm-devops-trainee-ecs
+
+  # CloudWatch log group for storing ECS logs
+  EcsTaskLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /ecs/tm-devops-trainee
+      RetentionInDays: 7
+
+  # ECS task definition for running the Nginx container with EFS integration
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: tm-devops-trainee-task
+      TaskRoleArn: !ImportValue tm-devops-trainee-task-role
+      ExecutionRoleArn: !ImportValue tm-devops-trainee-task-execution-role
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: '256'
+      Memory: '512'
+      ContainerDefinitions:
+        - Name: tm-devops-trainee-nginx
+          Image: 654654418834.dkr.ecr.eu-central-1.amazonaws.com/nginx-custom
+          Essential: true
+          LinuxParameters:
+            InitProcessEnabled: true
+          MountPoints:
+            - SourceVolume: efs-volume
+              ContainerPath: /usr/share/nginx/html
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              mode: non-blocking
+              max-buffer-size: 25m
+              awslogs-group: !Ref EcsTaskLogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: nginx
+          PortMappings:
+            - ContainerPort: 80
+              Protocol: tcp
+          # Script for automatically create index.html
+          Command:
+            - "/bin/sh"
+            - "-c"
+            - "echo '<html> <head> <title>Hello, Techmagic!</title> </head><body> <h1>Hello, Techmagic!!</h1> <h2>Automatically added file</h2></body></html>' > /usr/share/nginx/html/index.html && nginx -g 'daemon off;'"
+      Volumes:
+        - Name: efs-volume
+          EFSVolumeConfiguration:
+            FilesystemId: !ImportValue tm-devops-trainee-efs
+            RootDirectory: /
+            TransitEncryption: ENABLED
+
+  # ECS service to manage running container instances
+  ECSService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: tm-devops-trainee-ecs-service
+      Cluster: !Ref ECSCluster
+      LaunchType: FARGATE
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 75
+      DesiredCount: 1
+      EnableExecuteCommand: true
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - !ImportValue tm-devops-trainee-ecs-sg
+          Subnets:
+            - !ImportValue tm-devops-trainee-private-subnet-1
+            - !ImportValue tm-devops-trainee-private-subnet-2
+      TaskDefinition: !Ref TaskDefinition
+      LoadBalancers:
+        - TargetGroupArn: !ImportValue tm-devops-trainee-tg
+          ContainerName: tm-devops-trainee-nginx
+          ContainerPort: 80
+
+Outputs:
+
+  # Output ECS
+  ECSClusterName:
+    Description: Name of the ECS Cluster
+    Value: !Ref ECSCluster
+    Export:
+      Name: tm-devops-trainee-ecs
+
+  # Output ECS
+  ECSServiceName:
+    Description: Name of the ECS Service
+    Value: !Ref ECSService
+    Export:
+      Name: tm-devops-trainee-ecs-service
+

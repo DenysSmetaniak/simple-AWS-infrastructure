@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create an EFS and mount targets for private subnet-1 and subnet-2
+
+Resources:
+
+  # Create EFS with name 'tm-devops-trainee-efs'
+  EFSFileSystem:
+    Type: AWS::EFS::FileSystem
+    Properties:
+      Encrypted: true
+      PerformanceMode: generalPurpose
+      ThroughputMode: bursting
+      FileSystemTags:
+        - Key: Name
+          Value: 'tm-devops-trainee-efs'
+
+  # Mount target allows usage of the EFS inside of tm-devops-trainee-private-subnet-1
+  EFSMountTargetOne:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref EFSFileSystem
+      SubnetId: !ImportValue tm-devops-trainee-private-subnet-1
+      SecurityGroups:
+        - !ImportValue tm-devops-trainee-efs-sg
+
+  # Mount target allows usage of the EFS inside of tm-devops-trainee-private-subnet-2
+  EFSMountTargetTwo:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref EFSFileSystem
+      SubnetId: !ImportValue tm-devops-trainee-private-subnet-2
+      SecurityGroups:
+        - !ImportValue tm-devops-trainee-efs-sg
+
+Outputs:
+
+  EFSFileSystemID:
+    Description: EFS File System ID
+    Value: !Ref EFSFileSystem
+    Export:
+      Name: 'tm-devops-trainee-efs'
+
+  EFSFileSystemArn:
+    Description: EFS File System ARN
+    Value: !GetAtt EFSFileSystem.Arn
+    Export:
+      Name: 'tm-devops-trainee-efs-arn'

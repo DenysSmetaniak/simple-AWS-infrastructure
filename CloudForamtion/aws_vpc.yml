@@ -1,0 +1,208 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create VPC with Public and Private subnets, NAT gateway, and routing tables
+
+# CIDR settings for VPCs and subnets
+Parameters:
+  VpcCidrBlock:
+    Type: String
+    Default: '10.0.0.0/16'
+    Description: 'CIDR block for the VPC'
+
+  PublicSubnet1CidrBlock:
+    Type: String
+    Default: '10.0.1.0/24'
+    Description: 'CIDR block for the Public subnet 1'
+
+  PublicSubnet2CidrBlock:
+    Type: String
+    Default: '10.0.3.0/24'
+    Description: 'CIDR block for the Public subnet 2'
+
+  PrivateSubnet1CidrBlock:
+    Type: String
+    Default: '10.0.2.0/24'
+    Description: 'CIDR block for the Private subnet 1'
+
+  PrivateSubnet2CidrBlock:
+    Type: String
+    Default: '10.0.4.0/24'
+    Description: 'CIDR block for the Private subnet 2'
+
+Resources:
+
+  # VPC
+  tm-devops-trainee-vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidrBlock
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: 'tm-devops-trainee-vpc'
+
+  # Public subnets for ALB
+  tm-devops-trainee-public-subnet-1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref tm-devops-trainee-vpc
+      CidrBlock: !Ref PublicSubnet1CidrBlock
+      AvailabilityZone: !Select [0, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: 'tm-devops-trainee-public-subnet-1'
+
+  tm-devops-trainee-public-subnet-2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref tm-devops-trainee-vpc
+      CidrBlock: !Ref PublicSubnet2CidrBlock
+      AvailabilityZone: !Select [1, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: 'tm-devops-trainee-public-subnet-2'
+
+  # Private subnets for ECS
+  tm-devops-trainee-private-subnet-1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref tm-devops-trainee-vpc
+      CidrBlock: !Ref PrivateSubnet1CidrBlock
+      AvailabilityZone: !Select [0, !GetAZs '']
+      Tags:
+        - Key: Name
+          Value: 'tm-devops-trainee-private-subnet-1'
+
+  tm-devops-trainee-private-subnet-2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref tm-devops-trainee-vpc
+      CidrBlock: !Ref PrivateSubnet2CidrBlock
+      AvailabilityZone: !Select [1, !GetAZs '']
+      Tags:
+        - Key: Name
+          Value: 'tm-devops-trainee-private-subnet-2'
+
+  # Internet gateway
+  tm-devops-trainee-igw:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: 'tm-devops-trainee-igw'
+
+  # Linking IGW to VPC
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref tm-devops-trainee-vpc
+      InternetGatewayId: !Ref tm-devops-trainee-igw
+
+  # Routing table for public subnets
+  tm-devops-trainee-public-route-table:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref tm-devops-trainee-vpc
+      Tags:
+        - Key: Name
+          Value: 'tm-devops-trainee-public-route-table'
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref tm-devops-trainee-public-route-table
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref tm-devops-trainee-igw
+
+  # Binding the route table to public subnets
+  PublicSubnetOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref tm-devops-trainee-public-subnet-1
+      RouteTableId: !Ref tm-devops-trainee-public-route-table
+
+  PublicSubnetTwoRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref tm-devops-trainee-public-subnet-2
+      RouteTableId: !Ref tm-devops-trainee-public-route-table
+
+  # NAT gateway
+  tm-devops-trainee-nat-eip:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  tm-devops-trainee-nat:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt tm-devops-trainee-nat-eip.AllocationId
+      SubnetId: !Ref tm-devops-trainee-public-subnet-1
+      Tags:
+        - Key: Name
+          Value: 'tm-devops-trainee-nat'
+
+  # Route tables for private subnets
+  tm-devops-trainee-private-route-table:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref tm-devops-trainee-vpc
+      Tags:
+        - Key: Name
+          Value: 'tm-devops-trainee-private-route-table'
+
+  PrivateRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref tm-devops-trainee-private-route-table
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref tm-devops-trainee-nat
+
+  # Binding the route table to private subnets
+  PrivateSubnetOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref tm-devops-trainee-private-route-table
+      SubnetId: !Ref tm-devops-trainee-private-subnet-1
+
+  PrivateSubnetTwoRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref tm-devops-trainee-private-route-table
+      SubnetId: !Ref tm-devops-trainee-private-subnet-2
+
+Outputs:
+
+  VpcId:
+    Description: The ID of the VPC
+    Value: !Ref tm-devops-trainee-vpc
+    Export:
+      Name: 'tm-devops-trainee-vpc'
+
+  PublicSubnet1:
+    Description: Public Subnet 1
+    Value: !Ref tm-devops-trainee-public-subnet-1
+    Export:
+      Name: 'tm-devops-trainee-public-subnet-1'
+
+  PublicSubnet2:
+    Description: Public Subnet 2
+    Value: !Ref tm-devops-trainee-public-subnet-2
+    Export:
+      Name: 'tm-devops-trainee-public-subnet-2'
+
+  PrivateSubnet1:
+    Description: Private Subnet 1
+    Value: !Ref tm-devops-trainee-private-subnet-1
+    Export:
+      Name: 'tm-devops-trainee-private-subnet-1'
+
+  PrivateSubnet2:
+    Description: Private Subnet 2
+    Value: !Ref tm-devops-trainee-private-subnet-2
+    Export:
+      Name: 'tm-devops-trainee-private-subnet-2'
+

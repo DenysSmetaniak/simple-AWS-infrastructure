@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creating ALB for tm-devops-trainee project
+
+Resources:
+
+  # Creating ALB with name 'tm-devops-trainee-alb'
+  ALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: tm-devops-trainee-alb
+      Subnets:
+        - !ImportValue tm-devops-trainee-public-subnet-1
+        - !ImportValue tm-devops-trainee-public-subnet-2
+      SecurityGroups:
+        - !ImportValue tm-devops-trainee-alb-sg
+      Scheme: internet-facing
+      LoadBalancerAttributes:
+        - Key: idle_timeout.timeout_seconds
+          Value: 60
+      Tags:
+        - Key: Name
+          Value: tm-devops-trainee-alb
+
+  # Creating ALB target group
+  ALBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: tm-devops-trainee-tg
+      HealthCheckIntervalSeconds: 30
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      Port: 80
+      Protocol: HTTP
+      UnhealthyThresholdCount: 3
+      VpcId: !ImportValue tm-devops-trainee-vpc
+      TargetType: ip
+
+  # Creating ALB listener
+  ALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref ALB
+      Protocol: HTTP
+      Port: 80
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref ALBTargetGroup
+
+Outputs:
+  # Export ALB target group and ALB DNS name values
+  ALBDNSName:
+    Description: The DNS name of the external Application Load Balancer
+    Value: !GetAtt ALB.DNSName
+    Export:
+      Name: tm-devops-trainee-alb-dns
+
+  ALBTargetGroup:
+    Description: ALB Target Group
+    Value: !Ref ALBTargetGroup
+    Export:
+      Name: tm-devops-trainee-tg

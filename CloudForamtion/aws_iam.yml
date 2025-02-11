@@ -1,26 +1,24 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Create IAM Roles for EFS mounting and mounting
+Description: Create IAM Roles for EFS mounting and ECS task execution
 
 Resources:
-  # This Role used for mounting EFS to the container 
-  TaskExecutionRole:
+
+  # IAM role for ECS task execution (used for mounting EFS to the container)
+  tm-devops-trainee-ecs-task-execution-role:
     Type: AWS::IAM::Role
     Properties:
+      RoleName: tm-devops-trainee-ecs-task-execution-role
       AssumeRolePolicyDocument:
+        Version: '2012-10-17'
         Statement:
           - Effect: Allow
             Principal:
               Service: [ecs-tasks.amazonaws.com]
             Action: ['sts:AssumeRole']
-            Condition:
-              ArnLike:
-                aws:SourceArn: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:*
-              StringEquals:
-                aws:SourceAccount: !Ref AWS::AccountId
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
       Policies:
-        - PolicyName: EFSAccess
+        - PolicyName: tm-devops-trainee-EFSAccess
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -30,25 +28,22 @@ Resources:
                   - elasticfilesystem:ClientWrite
                   - elasticfilesystem:DescribeMountTargets
                   - elasticfilesystem:DescribeFileSystems
-                Resource: !ImportValue EFSFileSystemArn
+                Resource: !ImportValue tm-devops-trainee-efs-arn
 
-  # This role allows ECS tusks to interact with AWS Systems Manager to create and open management and data channels.
-  TaskRole:
+  # IAM role for ECS tasks (allows ECS tasks to interact with AWS systems manager for exec access)
+  tm-devops-trainee-ecs-task-role:
     Type: AWS::IAM::Role
     Properties:
+      RoleName: tm-devops-trainee-ecs-task-role
       AssumeRolePolicyDocument:
+        Version: '2012-10-17'
         Statement:
           - Effect: Allow
             Principal:
               Service: [ecs-tasks.amazonaws.com]
             Action: ['sts:AssumeRole']
-            Condition:
-              ArnLike:
-                aws:SourceArn: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:*
-              StringEquals:
-                aws:SourceAccount: !Ref AWS::AccountId
       Policies:
-        - PolicyName: ExecAccess
+        - PolicyName: tm-devops-trainee-ExecAccess
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -61,17 +56,19 @@ Resources:
                 Resource: '*'
 
 Outputs:
-  # Export value TaskExecutionRoleArn and TaskRoleArn
+
+  # Export IAM role ARNs for ECS tasks
   TaskExecutionRoleArn:
-    Description: TaskExecutionRole Arn
-    Value: !GetAtt TaskExecutionRole.Arn
+    Description: ECS Task Execution Role ARN
+    Value: !GetAtt tm-devops-trainee-ecs-task-execution-role.Arn
     Export:
-      Name: 'TaskExecutionRoleArn'
+      Name: 'tm-devops-trainee-task-execution-role-arn'
 
   TaskRoleArn:
-    Description: TaskRole Arn
-    Value: !GetAtt TaskRole.Arn
+    Description: ECS Task Role ARN
+    Value: !GetAtt tm-devops-trainee-ecs-task-role.Arn
     Export:
-      Name: 'TaskRoleArn'
+      Name: 'tm-devops-trainee-task-role-arn'
+
 
 
