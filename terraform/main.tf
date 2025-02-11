@@ -8,8 +8,8 @@ terraform {
 }
 
 provider "aws" {
-#   profile = "terraform"
-  region  = var.aws_region
+  #   profile = "terraform"
+  region = var.aws_region
 }
 
 resource "aws_resourcegroups_group" "my_group" {
