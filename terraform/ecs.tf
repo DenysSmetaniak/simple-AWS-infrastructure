@@ -2,7 +2,7 @@ resource "aws_ecs_cluster" "ecs_cluster" {
   name = var.ecs_cluster_name
 
   setting {
-    name = var.ecs_cluster_setting_name
+    name  = var.ecs_cluster_setting_name
     value = var.ecs_cluster_setting_value
   }
 
@@ -12,8 +12,8 @@ resource "aws_ecs_cluster" "ecs_cluster" {
 }
 
 resource "aws_ecs_cluster_capacity_providers" "ecs_cluster" {
-  cluster_name        = aws_ecs_cluster.ecs_cluster.name
-  capacity_providers  = ["FARGATE"]
+  cluster_name       = aws_ecs_cluster.ecs_cluster.name
+  capacity_providers = ["FARGATE"]
 
   default_capacity_provider_strategy {
     base              = 1
@@ -71,11 +71,11 @@ resource "aws_ecs_task_definition" "ecs_nginx_task" {
 
   container_definitions = jsonencode([
     {
-      name    = "nginx-container"
-      image   = "nginx:latest"
+      name       = "nginx-container"
+      image      = "nginx:latest"
       essentials = true
-      cpu     = 256
-      memory  = 512
+      cpu        = 256
+      memory     = 512
       # command = ["nginx", "-g", "daemon off;"]
       portMappings = [
         {
@@ -146,7 +146,7 @@ resource "aws_ecs_service" "ecs_nginx_service" {
 
   network_configuration {
     # subnets          = module.vpc.public_subnets
-    subnets          =  ["subnet-0241f21e3d4ad2ceb"]
+    subnets          = ["subnet-0241f21e3d4ad2ceb"]
     security_groups  = [aws_security_group.tm_devops_trainee_ecs_sg.id]
     assign_public_ip = true
   }

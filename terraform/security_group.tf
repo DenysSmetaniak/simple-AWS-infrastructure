@@ -62,11 +62,11 @@ resource "aws_security_group" "tm_devops_trainee_efs_sg" {
   vpc_id      = module.vpc.vpc_id
 
   ingress {
-    description = "Allow NFS traffic from ECS only"
-    from_port = 2049
-    to_port   = 2049
-    protocol  = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    description     = "Allow NFS traffic from ECS only"
+    from_port       = 2049
+    to_port         = 2049
+    protocol        = "tcp"
+    cidr_blocks     = ["0.0.0.0/0"]
     security_groups = [aws_security_group.tm_devops_trainee_ecs_sg.id]
   }
 

@@ -67,22 +67,22 @@ variable "rg_name" {
 ////////////////// Variable for S3 and DynamoDB /////////////////
 
 variable "bucket" {
-  type = string
+  type    = string
   default = "tm-devops-trainee-bucket"
 }
 
 variable "bucket_key" {
-  type = string
+  type    = string
   default = "terraform/state/terraform.tfstate"
 }
 
 variable "dynamodb_table_name" {
-  type = string
+  type    = string
   default = "tm-devops-trainee-table"
 }
 
 variable "s3_encrypt" {
-  type = bool
+  type    = bool
   default = true
 }
 
@@ -156,52 +156,52 @@ variable "ecs_cluster_name" {
 }
 
 variable "ecs_cluster_setting_name" {
-  type = string
+  type    = string
   default = "containerInsights"
 }
 
 variable "ecs_cluster_setting_value" {
-  type = string
+  type    = string
   default = "enabled"
 }
 
 variable "ecs_task_execution_role_name" {
-  type = string
+  type    = string
   default = "ecsTaskExecutionRole"
 }
 
 variable "ecs_task_execution_role_policy_name" {
-  type = string
+  type    = string
   default = "ecs-task-execution-role-policy"
 }
 
 variable "ecs_nginx_task_family" {
-  type = string
+  type    = string
   default = "ecs_nginx-task"
 }
 
 variable "ecs_nginx_task_nm" {
-  type = string
+  type    = string
   default = "awsvpc"
 }
 
 variable "ecs_nginx_task_cpu" {
-  type = number
+  type    = number
   default = 256
 }
 
 variable "ecs_nginx_task_memory" {
-  type = number
+  type    = number
   default = 512
 }
 
 variable "ecs_nginx_service_name" {
-  type = string
+  type    = string
   default = "nginx-service"
 }
 
 variable "efs_access" {
-  type = string
+  type    = string
   default = "ecs-efs-access-policy"
 }
 
