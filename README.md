@@ -1,4 +1,4 @@
-# Infrastructure Setup with EFS, ECS, and ALB
+# Infrastructure setup with EFS, ECS, and ALB
 
 ## **Objective**
 This project aims to create a simple AWS infrastructure using **Terraform** to deploy a basic web application. The setup includes:
@@ -9,7 +9,7 @@ This project aims to create a simple AWS infrastructure using **Terraform** to d
 
 ---
 
-## **1. AWS Infrastructure Components**
+## **1. AWS infrastructure components**
 
 ### **Amazon EFS (Elastic File System)**
 - Created an **Amazon EFS file system** named **`tm-devops-trainee-efs`**.
@@ -42,10 +42,10 @@ This project aims to create a simple AWS infrastructure using **Terraform** to d
 
 ---
 
-## **2. Terraform Implementation**
+## **2. Terraform implementation**
 Terraform was used to define all the AWS resources in a **modular, reusable, and maintainable** way.
 
-### **Project Structure**
+### **Project structure**
 ```bash
 terraform/
 ├── alb.tf
@@ -68,21 +68,21 @@ terraform/
 
 ---
 
-## **3. Deployment Instructions**
+## **3. Deployment instructions**
 
 ### **Pre-requisites**
 - **Terraform v1.9.8 or later** installed.
 - **AWS CLI** installed and configured with IAM credentials.
 - **GitHub Actions configured** for CI/CD deployment.
 
-### **Steps to Deploy**
-#### **Step 1: Clone the Repository**
+### **Steps to deploy**
+#### **Step 1: clone the repo**
 ```bash
-git clone https://github.com/your-repo/terraform-aws-infra.git
-cd terraform-aws-infra
+git clone https://github.com/DenysSmetaniak/simple-AWS-infrastructure
+cd terraform
 ```
 
-#### **Step 2: Configure AWS Credentials**
+#### **Step 2: configure AWS credentials**
 ```bash
 export AWS_ACCESS_KEY_ID="your-access-key"
 export AWS_SECRET_ACCESS_KEY="your-secret-key"
@@ -93,27 +93,32 @@ Alternatively, use **AWS CLI**:
 aws configure
 ```
 
-#### **Step 3: Initialize Terraform**
+#### **Step 3: initialize terraform**
 ```bash
 terraform init
 ```
 
-#### **Step 4: Validate Configuration**
+#### **Step 4: formating configuration**
+```bash
+terraform fmt
+```
+
+#### **Step 5: validate configuration**
 ```bash
 terraform validate
 ```
 
-#### **Step 5: Plan Deployment**
+#### **Step 6: plan deployment**
 ```bash
 terraform plan -out=tfplan
 ```
 
-#### **Step 6: Apply Deployment**
+#### **Step 7: apply deployment**
 ```bash
 terraform apply -auto-approve tfplan
 ```
 
-#### **Step 7: Get ALB Public URL**
+#### **Step 8: get ALB public URL**
 ```bash
 terraform output alb_dns_name
 ```
@@ -124,11 +129,11 @@ Now, open the **ALB DNS name** in your browser to see the **Hello, TechMagic!** 
 ## **4. CI/CD with GitHub Actions**
 GitHub Actions was used to **automate infrastructure deployment**.
 
-### **Workflow Overview**
+### **Workflow overview**
 - **Terraform Plan (`test` job)**: Runs on every `push` or `pull_request` to `main`.
 - **Terraform Apply (`production` job)**: Runs **only after manual approval** in `GitHub Environments`.
 
-### **GitHub Actions Workflow**
+### **GitHub Actions workflow**
 ```yaml
 name: Terraform Deployment
 
@@ -145,28 +150,39 @@ env:
 
 jobs:
   test:
-    name: Terraform Plan (Test)
+    name: Terraform Plan (CI)
     runs-on: ubuntu-latest
+    environment: test
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" -backend-config="dynamodb_table=${{ secrets.TF_LOCK_TABLE }}" -input=false
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        working-directory: terraform
+
+      - name: Terraform Format
+        run: terraform fmt -check
+        working-directory: terraform
+
+      - name: Terraform Validate
+        run: terraform validate
         working-directory: terraform
 
       - name: Terraform Plan
         run: terraform plan -out=tfplan
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ env.AWS_REGION }}
+          TF_VAR_certificate_arn: ${{ secrets.TF_VAR_CERTIFICATE_ARN }}
         working-directory: terraform
 
       - name: Upload Terraform Plan
@@ -175,21 +191,18 @@ jobs:
           name: tfplan
           path: terraform/tfplan
 
+
   production:
-    name: Terraform Apply (Production)
+    name: Terraform Apply (CD)
     needs: test
     runs-on: ubuntu-latest
+    environment:
+      name: production
     if: github.ref == 'refs/heads/main'
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
 
       - name: Download Terraform Plan
         uses: actions/download-artifact@v4
@@ -200,19 +213,30 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
 
+      - name: Terraform Init
+        run: terraform init -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" -backend-config="dynamodb_table=${{ secrets.TF_LOCK_TABLE }}" -input=false
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        working-directory: terraform
+
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          TF_VAR_certificate_arn: ${{ secrets.TF_VAR_CERTIFICATE_ARN }}
         working-directory: terraform
 ```
 
 ---
 
-## **5. Infrastructure Diagram**
+## **5. Infrastructure diagram**
 *(Attach Lucidchart, Draw.io, or Excalidraw diagram here)*
 
 ---
 
-## **6. Best Practices Followed**
+## **6. Best practices followed**
 - **Used Terraform modules** for modular infrastructure.
 - **Implemented security best practices**.
 - **Used ALB health checks** to maintain high availability.
