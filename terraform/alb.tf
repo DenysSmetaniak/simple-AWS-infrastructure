@@ -1,4 +1,4 @@
-# Application Load Balancer (ALB)
+# # Application Load Balancer (ALB)
 resource "aws_lb" "tm_devops_trainee_alb" {
   name                       = var.alb_name
   internal                   = false
@@ -40,21 +40,6 @@ resource "aws_lb_listener" "tm_devops_trainee_https" {
   }
 }
 
-
-
-
-# # ALB listener (HTTP 80 → target group)
-# resource "aws_lb_listener" "tm_devops_trainee_listener" {
-#   load_balancer_arn = aws_lb.tm_devops_trainee_alb.arn
-#   port              = 80
-#   protocol          = "HTTP"
-#
-#   default_action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.tm_devops_trainee_tg.arn
-#   }
-# }
-
 # module "alb" {
 #   source = "terraform-aws-modules/alb/aws"
 #
@@ -75,26 +60,6 @@ resource "aws_lb_listener" "tm_devops_trainee_https" {
 #     prefix  = "alb-logs"
 #     enabled = true
 #   }
-#   # HTTP and HTTPS listeners
-# #   listeners = [
-# #     {
-# #       port            = 443
-# #       protocol        = "HTTPS"
-# #       certificate_arn =
-# #       default_action = [{
-# #         type             = "forward"
-# #         target_group_arn = aws_lb_target_group.tm_devops_trainee_tg.arn
-# #       }]
-# #     },
-# #     {
-# #       port     = 80
-# #       protocol = "HTTP"
-# #       default_action = [{
-# #         type             = "forward"
-# #         target_group_arn = aws_lb_target_group.tm_devops_trainee_tg.arn
-# #       }]
-# #     }
-# #   ]
 #
 #   listeners = {
 #     http-redirect = {
@@ -124,6 +89,7 @@ resource "aws_lb_listener" "tm_devops_trainee_https" {
 #   }
 #
 # }
+
 
 
 
