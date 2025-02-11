@@ -117,6 +117,31 @@ terraform plan -out=tfplan
 ```bash
 terraform apply -auto-approve tfplan
 ```
+#### **Step 8: Connect to the Container and Create the File**
+To list running ECS tasks, use:
+```bash
+aws ecs list-tasks --cluster tm-devops-trainee-cluster
+```
+
+To connect to the running ECS container, execute the following command:
+```bash
+aws ecs execute-command --cluster tm-devops-trainee-cluster \
+  --task $(aws ecs list-tasks --cluster tm-devops-trainee-cluster --query "taskArns[0]" --output text) \
+  --container nginx-container \
+  --interactive --command "/bin/sh"
+```
+
+#### **Step 9: Verify System Installation**
+Check if the system is properly installed by running:
+```bash
+df -h
+```
+
+#### **Step 10: Run EFS Initialization Script**
+Execute the following command inside the container:
+```bash
+./init_efs.sh
+```
 
 #### **Step 8: get ALB public URL**
 ```bash
@@ -232,7 +257,8 @@ jobs:
 ---
 
 ## **5. Infrastructure diagram**
-*(Attach Lucidchart, Draw.io, or Excalidraw diagram here)*
+Schematic diagram of the main resources in AWS
+![Cloud diagram](./screen/Cloud_Infrastructure.jpeg)
 
 ---
 
@@ -246,6 +272,29 @@ jobs:
 
 ## **7. Conclusion**
 This project provisions **EFS, ECS, and ALB** using Terraform and deploys a simple **web application** inside **AWS ECS**. The infrastructure follows **AWS best practices**, and the deployment process is automated using **GitHub Actions**.
+
+## **8. Result of work**
+
+Push code into GitHub
+![Run Pipeline](./screen/run_pipeline.jpg)
+
+Successful completion of the testing phase and request for confirmation of deployment to the prod
+![Success CI](./screen/success_ci.jpg)
+
+Successful completion of two stages of pipelining
+
+![Success deploy](./screen/success_deploy.jpg)
+
+Resource group into AWS 
+![Resource 1](./screen/resource_1.jpg)
+![Resource 2](./screen/resource_2.jpg)
+![Resource 3](./screen/resource_3.jpg)
+
+Road tasks in load balancers
+![Road map tasks alb](./screen/alb_tm.jpg)
+
+And finally, congratulations to TechMagic
+![Hello TechMagic](./screen/hello_techmagic.jpg)
 
 🚀 **Now your AWS infrastructure is fully automated!**
 
