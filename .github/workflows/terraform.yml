@@ -9,9 +9,7 @@ on:
       - main
 
 env:
-  AWS_REGION: ${{ secrets.AWS_REGION }}
-  AWS_BUCKET_KEY: ${{ secrets.AWS_BUCKET_KEY }}
-  TF_VAR_CERTIFICATE_ARN: ${{ secrets.TF_VAR_CERTIFICATE_ARN }}
+  AWS_REGION: "eu-central-1"
 
 jobs:
   test:
@@ -26,7 +24,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
@@ -34,9 +32,9 @@ jobs:
       - name: Terraform Init
         run: |
           terraform init \
-            -backend-config="bucket=${{ secrets.AWS_BUCKET_KEY }}" \
+            -backend-config="bucket=${{ env.AWS_BUCKET }}" \
             -backend-config="key=terraform.tfstate" \
-            -backend-config="region=${{ secrets.AWS_REGION }}"
+            -backend-config="region=${{ env.AWS_REGION }}"
         working-directory: terraform
 
       - name: Terraform Plan
@@ -64,7 +62,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Download Terraform Plan
         uses: actions/download-artifact@v4
@@ -78,4 +76,5 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
         working-directory: terraform
+
 
